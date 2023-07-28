@@ -9,41 +9,33 @@ import React, { useEffect, useReducer, useRef, useState } from "react";
 export const DiaryStateContext = React.createContext();
 export const DiaryDispatchContext = React.createContext();
 
-const mockData = [
-  {
-    id: "mock1",
-    date: new Date().getTime() - 1,
-    content: "mock1",
-    emotionId: 1,
-  },
-  {
-    id: "mock2",
-    date: new Date().getTime() - 2,
-    content: "mock2",
-    emotionId: 2,
-  },
-  {
-    id: "mock3",
-    date: new Date().getTime() - 3,
-    content: "mock3",
-    emotionId: 3,
-  },
-];
-
 const reducer = (state, action) => {
   switch (action.type) {
-    case "CREATE":
-      return [action.data, ...state];
+    case "CREATE": {
+      const newState = [action.data, ...state];
+      localStorage.setItem("diary", JSON.stringify(newState));
+      return newState;
+    }
+
     case "UPDATE": {
-      return state.map((it) =>
+      const newState = state.map((it) =>
         String(it.id) === String(action.data.id) ? { ...action.data } : it
       );
+      localStorage.setItem("diary", JSON.stringify(newState));
+      return newState;
     }
-    case "DELETE":
-      return state.filter((it) => String(it.id) !== String(action.targetId));
+
+    case "DELETE": {
+      const newState = state.filter(
+        (it) => String(it.id) !== String(action.targetId)
+      );
+      localStorage.setItem("diary", JSON.stringify(newState));
+      return newState;
+    }
 
     case "INIT":
       return action.data;
+
     default:
       return state;
   }
@@ -54,10 +46,20 @@ function App() {
   const idRef = useRef(0);
 
   useEffect(() => {
-    dispatch({
-      type: "INIT",
-      data: mockData,
-    });
+    const rawData = localStorage.getItem("diary");
+    if (!rawData) {
+      setIsDataLoaded(true);
+      return;
+    }
+    const localData = JSON.parse(rawData);
+    if (localData.length === 0) {
+      setIsDataLoaded(true);
+      return;
+    }
+    localData.sort((a, b) => Number(b.id) - Number(a.id)); // 내림차순 sort
+    idRef.current = localData[0].id + 1; // 값이 가장 큰 id에 1을 더해 dRef의 값으로 설정
+
+    dispatch({ type: "INIT", data: localData });
     setIsDataLoaded(true);
   }, []);
 
