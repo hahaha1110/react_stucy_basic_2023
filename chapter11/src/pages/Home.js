@@ -2,9 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import Button from "../component/Button";
 import Header from "../component/Header";
 import { DiaryStateContext } from "../App";
-import { getMonthRangedByDate } from "../util";
+import { getMonthRangedByDate, setPageTitle } from "../util";
 import DiaryList from "../component/DiaryList";
 const Home = () => {
+  useEffect(() => {
+    setPageTitle("hahaha의 감정 일기장");
+  }, []);
   const data = useContext(DiaryStateContext);
   const [pivotDate, setPivotDate] = useState(new Date());
   const [filteredData, setFilteredData] = useState([]);

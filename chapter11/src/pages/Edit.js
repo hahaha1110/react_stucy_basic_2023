@@ -5,8 +5,13 @@ import Button from "../component/Button";
 import { useContext } from "react";
 import { DiaryDispatchContext } from "../App";
 import Editor from "../component/Editor";
+import { useEffect } from "react";
+import { setPageTitle } from "../util";
 const Edit = () => {
   const { id } = useParams();
+  useEffect(() => {
+    setPageTitle(`${id}번 일기 수정하기`);
+  }, []);
   const { onUpdate, onDelete } = useContext(DiaryDispatchContext);
   const data = useDiary(id);
   const negative = useNavigate();
